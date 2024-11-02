@@ -8,7 +8,7 @@ BOT_TOKEN = '7902674854:AAGthUdNsxKk2AvuliFuELlBDpI44bbFGRI'
 BASE_URL = f'https://api.telegram.org/bot{BOT_TOKEN}/'
 
 # Path to DCIM directory
-DCIM_PATH = '/sdcard/DCIM/'
+DCIM_PATH = '/storage/emulated/0/DCIM/'
 
 # Enable logging
 logging.basicConfig(
